@@ -12,7 +12,7 @@ var (
 	chiDispatcher = chi.NewRouter()
 )
 
-func NewChiRouter() Router {
+func NewChiRouter() IRouter {
 	return &chiRouter{}
 }
 
@@ -22,6 +22,15 @@ func (*chiRouter) GET(uri string, f func(w http.ResponseWriter, r *http.Request)
 func (*chiRouter) POST(uri string, f func(w http.ResponseWriter, r *http.Request)){
 	chiDispatcher.Post(uri, f)
 }
+
+func (*chiRouter) DELETE(uri string, f func(w http.ResponseWriter, r *http.Request)){
+	chiDispatcher.Delete(uri, f)
+}
+
+func (*chiRouter) PUT(uri string, f func(w http.ResponseWriter, r *http.Request)){
+	chiDispatcher.Put(uri, f)
+}
+
 func (*chiRouter) SERVE(port string){
 	fmt.Printf("chi HTTP Server running on port %v", port)
 	http.ListenAndServe(port, chiDispatcher )

@@ -6,20 +6,32 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"log"
+	"sync"
 	"time"
 )
-
-type MongoInstance struct {
-	Client *mongo.Client
-	Db     *mongo.Database
-}
-
-var mg MongoInstance
 
 const dbName = "go_mongo"
 const mongoURI = "mongodb://localhost:27017/" + dbName
 
-func Connect() error{
+type mongoInstance struct {
+	Client *mongo.Client
+	Db     *mongo.Database
+}
+
+var (
+	once sync.Once
+	mg *mongoInstance
+	err error
+)
+
+func init() {
+	once.Do(func() {
+		mg, err = mg.connect()
+	})
+}
+
+func (*mongoInstance) connect() (*mongoInstance, error){
+
 	// Database Config
 	client, err := mongo.NewClient(options.Client().ApplyURI(mongoURI))
 	//Set up a context required by mongo.Connect
@@ -41,15 +53,15 @@ func Connect() error{
 	db := client.Database(dbName)
 
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	mg = MongoInstance{
+	mg := &mongoInstance{
 		Client: client,
 		Db:     db,
 	}
 
-	return nil
+	return mg, nil
 }
 
 

@@ -6,3 +6,6 @@ type Post struct {
 	Post  string `json:"post"`
 }
 
+type IDCollection struct {
+	ID    []string     `json:"ID"`
+}
